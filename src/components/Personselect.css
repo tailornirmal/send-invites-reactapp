@@ -3,3 +3,9 @@
     height: 500px;
     background-color: #EFEFEF; */
 }
+
+.person-select-check {
+    right: 0px;
+    padding-right: 10px;
+    position: absolute;
+}
