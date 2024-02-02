@@ -1,6 +1,6 @@
 import Header from "../Header";
-import Personselect from "../components/Personselect";
-import Sendinvite from "../components/Sendinvite";
+import Personselect from "../components/PersonSelect";
+import Sendinvite from "../components/SendInvite";
 
 function Layout({ children }) {
   return (

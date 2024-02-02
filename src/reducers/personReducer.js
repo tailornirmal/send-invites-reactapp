@@ -1,14 +1,18 @@
 export default function personReducer(state, action) {
   switch (action.type) {
-    case "SELECT_PERSON":
-      return [
+    case "SET_USERS": {
+      return {
         ...state,
-        {
-          userId: action.payload,
-          isPersonSelected: true,
-        },
-      ];
+        userList: action.payload,
+      };
+    }
+    case "SELECT_PERSON":
+      return {
+        ...state,
+        selectedUser: [...state.selectedUser, action.payload],
+      };
+
     default:
-      throw Error("Unknown action: " + action.type);
+      return state;
   }
 }

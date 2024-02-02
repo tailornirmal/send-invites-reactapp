@@ -1,38 +1,41 @@
 import { useEffect, useReducer, useState } from "react";
-import personReducer from "../reducers/personReducer";
 import LoadingSpinner from "../Utility/LoadingSpinner";
+import personReducer from "../Reducers/personReducer";
+import { setUsers } from "../Actions/PersonActions";
 
-import "./Personselect.css";
+import "./PersonSelect.css";
+
+const initialState = {
+  userList: [],
+  selectedUser: [],
+  isAllUserSelected: false,
+};
 
 export default function Personselect() {
   const URL = "https://jsonplaceholder.typicode.com/users";
-  const [userList, setUserList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
-  const [users, dispatch] = useReducer(personReducer, [{}]);
+  const [users, dispatch] = useReducer(personReducer, initialState);
 
   const fetchUserList = async () => {
     const res = await fetch(URL);
     const data = await res.json();
-    return setUserList(data);
+    setUsers(dispatch, data);
   };
 
-  // console.log("users", dispatch);
-
   useEffect(() => {
-    console.log("calling fetchUserList");
     try {
       fetchUserList();
       setLoading(false);
     } catch (e) {
       setLoading(false);
-      setErrorMessage("Server is not available");
+      setErrorMessage(`Error ${e.response.data}`);
     }
   }, []);
 
-  console.log("loading", loading);
-
   const renderUserList = () => {
+    const { userList } = users;
+    console.log("userList", userList[0]);
     if (userList.length) {
       const data = userList.map((dataObject) => {
         return (
@@ -45,7 +48,9 @@ export default function Personselect() {
                 value={dataObject.id}
                 aria-label="Checkbox for following text input"
                 title={`Select ${dataObject.name}`}
-                onClick={() => selectUser(dataObject)}
+                onClick={() =>
+                  dispatch({ type: "SELECT_PERSON", payload: dataObject })
+                }
               />
             </span>
           </li>
@@ -55,9 +60,9 @@ export default function Personselect() {
     }
   };
 
-  const selectUser = (object) => {
-    console.log(object);
-  };
+  if (errorMessage) {
+    return <div>{errorMessage}</div>;
+  }
 
   return (
     <div className="row" style={{ padding: "10px" }}>
