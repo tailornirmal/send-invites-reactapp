@@ -1,3 +1,4 @@
+import React from "react";
 import { useEffect, useReducer, useState } from "react";
 import LoadingSpinner from "../Utility/LoadingSpinner";
 import personReducer from "../Reducers/personReducer";
@@ -33,9 +34,39 @@ export default function Personselect() {
     }
   }, []);
 
+  const selectUser = (user) => {
+    const { selectedUser } = users;
+    const ifUserAlreadySelected = selectedUser.filter((e) => e.id === user.id);
+
+    if (ifUserAlreadySelected.length) {
+      dispatch({
+        type: "DESELECT_PERSON",
+        payload: user,
+      });
+    } else {
+      dispatch({
+        type: "SELECT_PERSON",
+        payload: user,
+      });
+    }
+  };
+
+  const selectAllUsers = () => {
+    const { isAllUserSelected } = users;
+
+    if (!isAllUserSelected) {
+      dispatch({
+        type: "SELECT_ALL_USERS",
+      });
+    } else {
+      dispatch({
+        type: "DESELECT_ALL_USERS",
+      });
+    }
+  };
+
   const renderUserList = () => {
-    const { userList } = users;
-    console.log("userList", userList[0]);
+    const { userList, selectedUser } = users;
     if (userList.length) {
       const data = userList.map((dataObject) => {
         return (
@@ -43,13 +74,17 @@ export default function Personselect() {
             {dataObject.name}
             <span className="person-select-check">
               <input
+                name="selectUser"
                 className="form-check-input mt-1"
                 type="checkbox"
                 value={dataObject.id}
                 aria-label="Checkbox for following text input"
                 title={`Select ${dataObject.name}`}
-                onClick={() =>
-                  dispatch({ type: "SELECT_PERSON", payload: dataObject })
+                onClick={() => selectUser(dataObject)}
+                checked={
+                  selectedUser.filter((e) => e.id === dataObject.id).length > 0
+                    ? true
+                    : false
                 }
               />
             </span>
@@ -64,11 +99,30 @@ export default function Personselect() {
     return <div>{errorMessage}</div>;
   }
 
+  console.log("users", users);
+
   return (
     <div className="row" style={{ padding: "10px" }}>
       <div className="col-12">
         <div className="card" style={{ width: "18rem" }}>
-          <div className="card-header">Select Person to Invite</div>
+          <div className="card-header alert alert-primary" role="alert">
+            Available Employees
+          </div>
+          <span className="mt-3 person-select-check">
+            <input
+              name="selectAllUser"
+              className="form-check-input mt-1"
+              type="checkbox"
+              aria-label="Checkbox for following text input"
+              title={`Select all available users`}
+              onClick={selectAllUsers}
+              // checked={
+              //   selectedUser.filter((e) => e.id === dataObject.id).length > 0
+              //     ? true
+              //     : false
+              // }
+            />
+          </span>
           <ul className="list-group list-group-flush">
             {loading ? <LoadingSpinner /> : renderUserList()}
           </ul>
