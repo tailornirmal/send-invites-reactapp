@@ -12,7 +12,7 @@ const initialState = {
   isAllUserSelected: false,
 };
 
-export default function Personselect() {
+export default function PersonSelect() {
   const URL = "https://jsonplaceholder.typicode.com/users";
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
