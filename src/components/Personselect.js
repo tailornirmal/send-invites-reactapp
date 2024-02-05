@@ -3,6 +3,7 @@ import { useEffect, useReducer, useState } from "react";
 import LoadingSpinner from "../Utility/LoadingSpinner";
 import personReducer from "../Reducers/personReducer";
 import { setUsers } from "../Actions/PersonActions";
+import PersonConstants from "../Utility/Person.Constants";
 
 import "./PersonSelect.css";
 
@@ -40,12 +41,12 @@ export default function PersonSelect() {
 
     if (ifUserAlreadySelected.length) {
       dispatch({
-        type: "DESELECT_PERSON",
+        type: PersonConstants.deSelectPerson,
         payload: user,
       });
     } else {
       dispatch({
-        type: "SELECT_PERSON",
+        type: PersonConstants.selectPerson,
         payload: user,
       });
     }
@@ -54,13 +55,15 @@ export default function PersonSelect() {
   const selectAllUsers = () => {
     const { isAllUserSelected } = users;
 
+    console.log("isAllUserSelected", isAllUserSelected);
+
     if (!isAllUserSelected) {
       dispatch({
-        type: "SELECT_ALL_USERS",
+        type: PersonConstants.selectAllUser,
       });
     } else {
       dispatch({
-        type: "DESELECT_ALL_USERS",
+        type: PersonConstants.deselectAllUser,
       });
     }
   };
@@ -72,6 +75,24 @@ export default function PersonSelect() {
         return (
           <li key={dataObject.id} class="list-group-item">
             {dataObject.name}
+            <span className="subpara-intro">
+              <small className="text-body-secondary">
+                {dataObject.address.city}
+              </small>
+            </span>
+            <span className="subpara-intro">
+              <small className="text-body-secondary">
+                {dataObject.address.suite}
+              </small>
+            </span>
+            <span className="subpara-intro">
+              <small className="text-body-secondary">
+                {dataObject.address.zipcode}
+              </small>
+            </span>
+            <span>
+              <label className="available-icon"></label>
+            </span>
             <span className="person-select-check">
               <input
                 name="selectUser"
@@ -82,16 +103,15 @@ export default function PersonSelect() {
                 title={`Select ${dataObject.name}`}
                 onClick={() => selectUser(dataObject)}
                 checked={
-                  selectedUser.filter((e) => e.id === dataObject.id).length > 0
-                    ? true
-                    : false
+                  selectedUser.filter((e) => e.id === dataObject.id).length >
+                    0 && true
                 }
               />
             </span>
           </li>
         );
       });
-      return data || [];
+      return data.length ? data : [];
     }
   };
 
@@ -104,9 +124,9 @@ export default function PersonSelect() {
   return (
     <div className="row" style={{ padding: "10px" }}>
       <div className="col-12">
-        <div className="card" style={{ width: "18rem" }}>
-          <div className="card-header alert alert-primary" role="alert">
-            Available Employees
+        <div className="card">
+          <div className="select-all-person">
+            {PersonConstants.availableEmployees}
           </div>
           <span className="mt-3 person-select-check">
             <input
@@ -116,11 +136,6 @@ export default function PersonSelect() {
               aria-label="Checkbox for following text input"
               title={`Select all available users`}
               onClick={selectAllUsers}
-              // checked={
-              //   selectedUser.filter((e) => e.id === dataObject.id).length > 0
-              //     ? true
-              //     : false
-              // }
             />
           </span>
           <ul className="list-group list-group-flush">

@@ -1,11 +1,27 @@
-.body {
-    /* width: auto;
-    height: 500px;
-    background-color: #EFEFEF; */
+.person-select-check {
+  right: 0px;
+  padding-right: 10px;
+  position: absolute;
 }
 
-.person-select-check {
-    right: 0px;
-    padding-right: 10px;
-    position: absolute;
+.select-all-person {
+  width: auto;
+  height: 50px;
+  text-align: center;
+  position: relative;
+  padding: 15px 9px 0px 1px;
+  background-color: cornsilk;
+}
+
+.available-icon {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: green;
+  margin: 7px;
+  position: absolute;
+}
+
+.subpara-intro {
+    margin: 10px;
 }
