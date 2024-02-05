@@ -1,5 +1,5 @@
 export default function personReducer(state, action) {
-  console.log("action", action);
+  // console.log("action", action);
   switch (action.type) {
     case "SET_USERS": {
       return {
@@ -20,7 +20,7 @@ export default function personReducer(state, action) {
         ),
       };
     case "SELECT_ALL_USERS":
-      console.log("calling select user");
+      // console.log("calling select user");
       return {
         ...state,
         isAllUserSelected: true,

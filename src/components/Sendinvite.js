@@ -1,5 +1,62 @@
-import React from "react";
+import React, { useReducer } from "react";
+import InvitessReducer from "../Reducers/InviteesReducer";
+import personReducer from "../Reducers/personReducer";
+
+const initialState = {
+  from: "meeting.tailorsthought@ymail.com",
+  subject: "",
+  to: "",
+  time: "",
+  room: "",
+  message: "",
+};
+
+const availableMeetingRooms = [
+  {
+    id: 0,
+    name: "No Room",
+  },
+  {
+    id: 1,
+    name: "Elon",
+  },
+  {
+    id: 2,
+    name: "Juck",
+  },
+  {
+    id: 3,
+    name: "Tesla",
+  },
+  {
+    id: 4,
+    name: "SpaceX",
+  },
+  {
+    id: 5,
+    name: "Twitter",
+  },
+];
+
 export default function Sendinvite() {
+  const [invites, dispatch] = useReducer(InvitessReducer, initialState);
+  // const [users, dispatch] = useReducer(personReducer, {});
+
+  const handleChange = (e) => {
+    console.log(e.target.name);
+    console.log(e.target.value);
+
+    const { name, value } = e.target;
+
+    dispatch({
+      type: "UPDATE_FORM_FIELD",
+      payload: { name: name, value: value },
+    });
+  };
+
+  console.log("invites", invites);
+  console.log("users", personReducer);
+
   return (
     <div className="row">
       <div className="col-8">
@@ -11,9 +68,10 @@ export default function Sendinvite() {
             type="text"
             readOnly
             className="form-control"
-            placeholder="meeting.tailorsthought@ymail.com"
             aria-label="Username"
             aria-describedby="addon-wrapping"
+            required
+            value={invites.from}
           />
         </div>
         <div className="input-group input-group-sm mb-3 flex-nowrap">
@@ -22,10 +80,12 @@ export default function Sendinvite() {
           </span>
           <input
             type="text"
+            name="subject"
             className="form-control"
             placeholder="Meeting Purpose"
             aria-label="figma"
             aria-describedby="addon-wrapping"
+            onChange={handleChange}
           />
         </div>
         <div className="input-group input-group-sm mb-3 flex-nowrap">
@@ -60,14 +120,13 @@ export default function Sendinvite() {
           <select
             className="form-select form-select-sm"
             aria-label="Small select example"
-            value={1}
+            defaultValue={0}
+            onChange={handleChange}
+            name="room"
           >
-            <option defaultValue={1} selected>
-              Select from Available room
-            </option>
-            <option value="1">One</option>
-            <option value="2">Two</option>
-            <option value="3">Three</option>
+            {availableMeetingRooms.map((e) => {
+              return <option value={e.id}>{e.name}</option>;
+            })}
           </select>
         </div>
         <div className="input-group input-group-sm mb-3 flex-nowrap">
@@ -78,7 +137,7 @@ export default function Sendinvite() {
           ></textarea>
         </div>
         <div>
-          <button type="button" className="btn btn-primary">
+          <button type="button" className="btn btn-primary" disabled>
             Send
           </button>
         </div>
