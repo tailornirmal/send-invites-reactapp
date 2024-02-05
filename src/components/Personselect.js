@@ -3,26 +3,39 @@ import { useEffect, useReducer, useState } from "react";
 import LoadingSpinner from "../Utility/LoadingSpinner";
 import personReducer from "../Reducers/personReducer";
 import { setUsers } from "../Actions/PersonActions";
-import PersonConstants from "../Utility/Person.Constants";
+import {
+  PersonConstants,
+  availableMeetingRooms,
+} from "../Utility/Person.Constants";
 
 import "./PersonSelect.css";
 
-const initialState = {
+let initialState = {
   userList: [],
   selectedUser: [],
   isAllUserSelected: false,
+  from: "meeting.tailorsthought@ymail.com",
+  subject: "",
+  to: "",
+  time: "",
+  room: "",
+  message: "",
 };
 
 export default function PersonSelect() {
-  const URL = "https://jsonplaceholder.typicode.com/users";
+  const URL = PersonConstants.fetchURL;
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
   const [users, dispatch] = useReducer(personReducer, initialState);
 
   const fetchUserList = async () => {
-    const res = await fetch(URL);
-    const data = await res.json();
-    setUsers(dispatch, data);
+    try {
+      const res = await fetch(URL);
+      const data = await res.json();
+      setUsers(dispatch, data);
+    } catch (E) {
+      setErrorMessage("Error", E);
+    }
   };
 
   useEffect(() => {
@@ -37,7 +50,8 @@ export default function PersonSelect() {
 
   const selectUser = (user) => {
     const { selectedUser } = users;
-    const ifUserAlreadySelected = selectedUser.filter((e) => e.id === user.id);
+    const ifUserAlreadySelected =
+      selectedUser && selectedUser.filter((e) => e.id === user.id);
 
     if (ifUserAlreadySelected.length) {
       dispatch({
@@ -54,9 +68,6 @@ export default function PersonSelect() {
 
   const selectAllUsers = () => {
     const { isAllUserSelected } = users;
-
-    console.log("isAllUserSelected", isAllUserSelected);
-
     if (!isAllUserSelected) {
       dispatch({
         type: PersonConstants.selectAllUser,
@@ -70,7 +81,7 @@ export default function PersonSelect() {
 
   const renderUserList = () => {
     const { userList, selectedUser } = users;
-    if (userList.length) {
+    if (userList && userList.length) {
       const data = userList.map((dataObject) => {
         return (
           <li key={dataObject.id} class="list-group-item">
@@ -103,8 +114,10 @@ export default function PersonSelect() {
                 title={`Select ${dataObject.name}`}
                 onClick={() => selectUser(dataObject)}
                 checked={
+                  selectedUser &&
                   selectedUser.filter((e) => e.id === dataObject.id).length >
-                    0 && true
+                    0 &&
+                  true
                 }
               />
             </span>
@@ -119,11 +132,31 @@ export default function PersonSelect() {
     return <div>{errorMessage}</div>;
   }
 
-  // console.log("users", users);
+  const handleChange = (e) => {
+    console.log(e.target.name);
+    console.log(e.target.value);
+
+    const { name, value } = e.target;
+
+    dispatch({
+      type: "UPDATE_FORM_FIELD",
+      payload: { name: name, value: value },
+    });
+  };
+
+  const renderSelectedUsers = () => {
+    const { selectedUser } = users;
+    const allSelectedUsers = selectedUser.map((e) => e.name);
+    return allSelectedUsers;
+  };
+
+  console.log("users", users);
+
+  const sendInvite = () => {};
 
   return (
-    <div className="row" style={{ padding: "10px" }}>
-      <div className="col-12">
+    <div className="row col-12" style={{ padding: "10px" }}>
+      <div className="col-6">
         <div className="card">
           <div className="select-all-person">
             {PersonConstants.availableEmployees}
@@ -141,6 +174,87 @@ export default function PersonSelect() {
           <ul className="list-group list-group-flush">
             {loading ? <LoadingSpinner /> : renderUserList()}
           </ul>
+        </div>
+      </div>
+      <div className="col-6">
+        <div>
+          <div className="input-group input-group-sm mb-3 flex-nowrap">
+            <span className="input-group-text" id="addon-wrapping">
+              From
+            </span>
+            <input
+              type="text"
+              readOnly
+              className="form-control"
+              aria-label="Username"
+              aria-describedby="addon-wrapping"
+              required
+              value={users.from}
+              disabled
+            />
+          </div>
+          <div className="input-group input-group-sm mb-3 flex-nowrap">
+            <span className="input-group-text" id="addon-wrapping">
+              Subject
+            </span>
+            <input
+              type="text"
+              name="subject"
+              className="form-control"
+              placeholder="Meeting Purpose"
+              aria-label="figma"
+              aria-describedby="addon-wrapping"
+              onChange={handleChange}
+            />
+          </div>
+          <div className="input-group input-group-sm mb-3 flex-nowrap">
+            <span className="input-group-text" id="addon-wrapping">
+              To
+            </span>
+            <input
+              type="text"
+              className="form-control"
+              placeholder="Person 1, Person 2"
+              aria-label="figma"
+              aria-describedby="addon-wrapping"
+              value={renderSelectedUsers()}
+            />
+          </div>
+          <div className="input-group input-group-sm mb-3 flex-nowrap">
+            <span className="input-group-text" id="addon-wrapping">
+              Room
+            </span>
+
+            <select
+              className="form-select form-select-sm"
+              aria-label="Small select example"
+              defaultValue={0}
+              onChange={handleChange}
+              name="room"
+            >
+              {availableMeetingRooms.map((e) => {
+                return <option value={e.id}>{e.name}</option>;
+              })}
+            </select>
+          </div>
+          <div className="input-group input-group-sm mb-3 flex-nowrap">
+            <textarea
+              rows={8}
+              className="form-control"
+              aria-label="with textarea"
+              onChange={handleChange}
+              name="message"
+            ></textarea>
+          </div>
+          <div>
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={sendInvite}
+            >
+              Send
+            </button>
+          </div>
         </div>
       </div>
     </div>
