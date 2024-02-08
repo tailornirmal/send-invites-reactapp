@@ -6,6 +6,7 @@ import { setUsers } from "../Actions/PersonActions";
 import RenderList from "./RenderList";
 import RenderSelectedList from "./RenderSelectedList";
 import { PersonConstants } from "../Utility/Person.Constants";
+import InvitePreview from "./InvitePreview";
 
 import "./PersonSelect.css";
 
@@ -22,30 +23,28 @@ let initialState = {
 
 export default function PersonSelect() {
   const URL = PersonConstants.fetchURL;
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [users, dispatch] = useReducer(personReducer, initialState);
   const [formError, setFormError] = useState(false);
-
-  const fetchUserList = async () => {
-    try {
-      const res = await fetch(URL);
-      const data = await res.json();
-      setUsers(dispatch, data);
-    } catch (E) {
-      setErrorMessage("Error", E);
-    }
-  };
+  const [preview, setPreview] = useState(false);
 
   useEffect(() => {
-    try {
-      fetchUserList();
-      setLoading(false);
-    } catch (e) {
-      setLoading(false);
-      setErrorMessage(`Error ${e.response.data}`);
-    }
-  }, []);
+    const fetchUserList = async () => {
+      try {
+        setLoading(true);
+        const res = await fetch(URL);
+        const data = await res.json();
+        setUsers(dispatch, data);
+      } catch (error) {
+        setErrorMessage("Error", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserList();
+  }, [URL]);
 
   const selectUser = (user) => {
     const { selectedUser } = users;
@@ -100,20 +99,23 @@ export default function PersonSelect() {
 
   console.log("users", users);
 
-  const sendInvite = () => {
-    console.log("send invite clicked");
+  const sendInvite = (e) => {
+    // console.log("send invite clicked");
     const { from, subject, selectedUser, room, message } = users;
 
-    console.log(users);
+    // console.log(users);
 
     if (!from || !subject || selectedUser.length < 1 || !room || !message) {
       setFormError(true);
+      setPreview(false);
     } else {
       setFormError(false);
+      setPreview(true);
     }
   };
 
-  console.log("formerror", formError);
+  // console.log("formerror", formError);
+  // console.log("preview", preview);
 
   return (
     <div className="row col-12" style={{ padding: "10px" }}>
@@ -149,6 +151,7 @@ export default function PersonSelect() {
         formError={formError}
         setFormError={setFormError}
       />
+      <InvitePreview preview={preview} users={users} />
     </div>
   );
 }

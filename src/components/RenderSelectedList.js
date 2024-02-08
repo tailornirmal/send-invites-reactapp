@@ -91,7 +91,7 @@ export default function RenderSelectedList({
             onClick={sendInvite}
             disabled={formError}
           >
-            Send
+            Preview
           </button>
         </div>
       </div>
